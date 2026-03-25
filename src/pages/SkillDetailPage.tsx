@@ -245,8 +245,8 @@ const skillsData: Record<string, SkillData> = {
     ],
     videos: [
       {
-        title: 'Leadership Skills - Complete Course',
-        videoId: 'bJNpHvEqyLY'
+        title: 'What Makes a Good Leader - Simon Sinek',
+        videoId: 'ReRcHdeUG9Y'
       }
     ],
     resources: [
