@@ -68,16 +68,8 @@ const skillsData: Record<string, SkillData> = {
     ],
     videos: [
       {
-        title: 'Python Full Course for Beginners 2026',
-        videoId: '_uQrJ0TkZlc'
-      },
-      {
         title: 'Python Tutorial - Python for Beginners',
         videoId: 'rfscVS0vtbw'
-      },
-      {
-        title: 'Learn Python in 2026 - Complete Roadmap',
-        videoId: 'mDKM-JtUhhc'
       }
     ],
     resources: [
@@ -134,14 +126,6 @@ const skillsData: Record<string, SkillData> = {
       '10. Mock interviews and system design practice (4 weeks)'
     ],
     videos: [
-      {
-        title: 'Problem Solving Techniques for Programmers',
-        videoId: '8mAITcNt710'
-      },
-      {
-        title: 'How to Solve Coding Problems - Systematic Approach',
-        videoId: 'GBuHSRDGZBY'
-      },
       {
         title: 'Data Structures and Algorithms Full Course',
         videoId: 'RBSGKlAvoiM'
@@ -203,16 +187,8 @@ const skillsData: Record<string, SkillData> = {
     ],
     videos: [
       {
-        title: 'How to Prepare for Technical Interviews',
-        videoId: 'KdXAUst8bdo'
-      },
-      {
         title: 'System Design Interview Preparation',
         videoId: 'UzLMhqg3_Wc'
-      },
-      {
-        title: 'Behavioral Interview Questions and Answers',
-        videoId: 'PJKYqLP6MRE'
       }
     ],
     resources: [
@@ -271,14 +247,6 @@ const skillsData: Record<string, SkillData> = {
       {
         title: 'Leadership Skills - Complete Course',
         videoId: 'bJNpHvEqyLY'
-      },
-      {
-        title: 'How to Be a Great Leader',
-        videoId: 'VFIuJdwsIDM'
-      },
-      {
-        title: 'Leadership and Management Skills',
-        videoId: 'Ks-_Mh1QhMc'
       }
     ],
     resources: [
@@ -337,14 +305,6 @@ const skillsData: Record<string, SkillData> = {
       {
         title: 'Communication Skills - Complete Course',
         videoId: 'Unzc731iCUY'
-      },
-      {
-        title: 'How to Improve Communication Skills',
-        videoId: 'aX1JT4e8sSU'
-      },
-      {
-        title: 'Effective Communication Techniques',
-        videoId: 'HAnw168huqA'
       }
     ],
     resources: [
@@ -403,14 +363,6 @@ const skillsData: Record<string, SkillData> = {
       {
         title: 'Time Management Skills - Complete Guide',
         videoId: 'iONDebHX9qk'
-      },
-      {
-        title: 'How to Manage Your Time Better',
-        videoId: 'n7wH2XdOWpM'
-      },
-      {
-        title: 'Productivity and Time Management',
-        videoId: 'YTIhBBmL_fM'
       }
     ],
     resources: [
