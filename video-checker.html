@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Availability Checker - SkillSnap 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .instructions h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .video-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+        
+        .video-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .video-info {
+            margin-bottom: 12px;
+        }
+        
+        .video-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .video-id {
+            font-family: 'Courier New', monospace;
+            color: #666;
+            font-size: 0.9rem;
+            background: #e8e8e8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .video-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #000;
+        }
+        
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .status {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .status.working {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.broken {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.unknown {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .check-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .check-button:hover {
+            background: #5568d3;
+        }
+        
+        .summary {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card.total {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+        
+        .stat-card.working {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        
+        .stat-card.broken {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Video Availability Checker - SkillSnap 3D</h1>
+        
+        <div class="instructions">
+            <h2>📋 How to Use This Checker</h2>
+            <ol>
+                <li><strong>Scroll through each section</strong> below to see all videos</li>
+                <li><strong>Click the play button</strong> on each video to test if it plays</li>
+                <li><strong>Check for error messages</strong> like:
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>"Video unavailable"</li>
+                        <li>"This video is private"</li>
+                        <li>"Playback on other websites has been disabled"</li>
+                        <li>"Watch on YouTube" (with no play button)</li>
+                    </ul>
+                </li>
+                <li><strong>Click "Mark as Broken"</strong> button if a video doesn't play</li>
+                <li><strong>Click "Mark as Working"</strong> button if a video plays successfully</li>
+                <li><strong>Copy the summary</strong> at the top showing which videos to remove</li>
+            </ol>
+        </div>
+        
+        <div class="summary" id="summary">
+            <h2>📊 Test Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-card total">
+                    <div class="stat-number" id="totalCount">18</div>
+                    <div class="stat-label">Total Videos</div>
+                </div>
+                <div class="stat-card working">
+                    <div class="stat-number" id="workingCount">0</div>
+                    <div class="stat-label">Working</div>
+                </div>
+                <div class="stat-card broken">
+                    <div class="stat-number" id="brokenCount">0</div>
+                    <div class="stat-label">Broken</div>
+                </div>
+            </div>
+            <div id="brokenList" style="margin-top: 20px; display: none;">
+                <h3 style="color: #f44336; margin-bottom: 10px;">❌ Videos to Remove:</h3>
+                <ul id="brokenVideos" style="line-height: 1.8; margin-left: 20px;"></ul>
+            </div>
+        </div>
+        
+        <!-- Python Programming -->
+        <div class="section">
+            <h2 class="section-title">🐍 Python Programming</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Python Programming" data-id="_uQrJ0TkZlc">
+                    <div class="video-info">
+                        <div class="video-title">Python Full Course for Beginners 2026</div>
+                        <div class="video-id">ID: _uQrJ0TkZlc</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/_uQrJ0TkZlc" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Python Programming" data-id="rfscVS0vtbw">
+                    <div class="video-info">
+                        <div class="video-title">Python Tutorial - Python for Beginners</div>
+                        <div class="video-id">ID: rfscVS0vtbw</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/rfscVS0vtbw" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Python Programming" data-id="mDKM-JtUhhc">
+                    <div class="video-info">
+                        <div class="video-title">Learn Python in 2026 - Complete Roadmap</div>
+                        <div class="video-id">ID: mDKM-JtUhhc</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/mDKM-JtUhhc" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem Solving -->
+        <div class="section">
+            <h2 class="section-title">🧩 Problem Solving</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Problem Solving" data-id="8mAITcNt710">
+                    <div class="video-info">
+                        <div class="video-title">Problem Solving Techniques for Programmers</div>
+                        <div class="video-id">ID: 8mAITcNt710</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/8mAITcNt710" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Problem Solving" data-id="GBuHSRDGZBY">
+                    <div class="video-info">
+                        <div class="video-title">How to Solve Coding Problems - Systematic Approach</div>
+                        <div class="video-id">ID: GBuHSRDGZBY</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/GBuHSRDGZBY" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Problem Solving" data-id="RBSGKlAvoiM">
+                    <div class="video-info">
+                        <div class="video-title">Data Structures and Algorithms Full Course</div>
+                        <div class="video-id">ID: RBSGKlAvoiM</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/RBSGKlAvoiM" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interview Preparation -->
+        <div class="section">
+            <h2 class="section-title">💼 Interview Preparation</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Interview Preparation" data-id="KdXAUst8bdo">
+                    <div class="video-info">
+                        <div class="video-title">How to Prepare for Technical Interviews</div>
+                        <div class="video-id">ID: KdXAUst8bdo</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/KdXAUst8bdo" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Interview Preparation" data-id="UzLMhqg3_Wc">
+                    <div class="video-info">
+                        <div class="video-title">System Design Interview Preparation</div>
+                        <div class="video-id">ID: UzLMhqg3_Wc</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/UzLMhqg3_Wc" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Interview Preparation" data-id="PJKYqLP6MRE">
+                    <div class="video-info">
+                        <div class="video-title">Behavioral Interview Questions and Answers</div>
+                        <div class="video-id">ID: PJKYqLP6MRE</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/PJKYqLP6MRE" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leadership -->
+        <div class="section">
+            <h2 class="section-title">👥 Leadership</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Leadership" data-id="bJNpHvEqyLY">
+                    <div class="video-info">
+                        <div class="video-title">Leadership Skills - Complete Course</div>
+                        <div class="video-id">ID: bJNpHvEqyLY</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/bJNpHvEqyLY" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Leadership" data-id="VFIuJdwsIDM">
+                    <div class="video-info">
+                        <div class="video-title">How to Be a Great Leader</div>
+                        <div class="video-id">ID: VFIuJdwsIDM</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/VFIuJdwsIDM" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Leadership" data-id="Ks-_Mh1QhMc">
+                    <div class="video-info">
+                        <div class="video-title">Leadership and Management Skills</div>
+                        <div class="video-id">ID: Ks-_Mh1QhMc</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/Ks-_Mh1QhMc" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Communication -->
+        <div class="section">
+            <h2 class="section-title">💬 Communication</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Communication" data-id="Unzc731iCUY">
+                    <div class="video-info">
+                        <div class="video-title">Communication Skills - Complete Course</div>
+                        <div class="video-id">ID: Unzc731iCUY</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/Unzc731iCUY" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Communication" data-id="aX1JT4e8sSU">
+                    <div class="video-info">
+                        <div class="video-title">How to Improve Communication Skills</div>
+                        <div class="video-id">ID: aX1JT4e8sSU</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/aX1JT4e8sSU" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Communication" data-id="HAnw168huqA">
+                    <div class="video-info">
+                        <div class="video-title">Effective Communication Techniques</div>
+                        <div class="video-id">ID: HAnw168huqA</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/HAnw168huqA" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Time Management -->
+        <div class="section">
+            <h2 class="section-title">⏰ Time Management</h2>
+            <div class="video-grid">
+                <div class="video-card" data-section="Time Management" data-id="iONDebHX9qk">
+                    <div class="video-info">
+                        <div class="video-title">Time Management Skills - Complete Guide</div>
+                        <div class="video-id">ID: iONDebHX9qk</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/iONDebHX9qk" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Time Management" data-id="n7wH2XdOWpM">
+                    <div class="video-info">
+                        <div class="video-title">How to Manage Your Time Better</div>
+                        <div class="video-id">ID: n7wH2XdOWpM</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/n7wH2XdOWpM" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+                
+                <div class="video-card" data-section="Time Management" data-id="YTIhBBmL_fM">
+                    <div class="video-info">
+                        <div class="video-title">Productivity and Time Management</div>
+                        <div class="video-id">ID: YTIhBBmL_fM</div>
+                    </div>
+                    <div class="video-embed">
+                        <iframe src="https://www.youtube.com/embed/YTIhBBmL_fM" allowfullscreen></iframe>
+                    </div>
+                    <div class="status unknown">⏳ Not tested yet</div>
+                    <button class="check-button" onclick="markWorking(this)">✅ Mark as Working</button>
+                    <button class="check-button" style="background: #f44336; margin-top: 5px;" onclick="markBroken(this)">❌ Mark as Broken</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let brokenVideos = [];
+        let workingVideos = [];
+        
+        function markWorking(button) {
+            const card = button.closest('.video-card');
+            const section = card.dataset.section;
+            const id = card.dataset.id;
+            const title = card.querySelector('.video-title').textContent;
+            
+            // Remove from broken if it was there
+            brokenVideos = brokenVideos.filter(v => v.id !== id);
+            
+            // Add to working if not already there
+            if (!workingVideos.find(v => v.id === id)) {
+                workingVideos.push({ section, id, title });
+            }
+            
+            // Update status
+            const status = card.querySelector('.status');
+            status.className = 'status working';
+            status.textContent = '✅ Working - Plays correctly';
+            
+            updateSummary();
+        }
+        
+        function markBroken(button) {
+            const card = button.closest('.video-card');
+            const section = card.dataset.section;
+            const id = card.dataset.id;
+            const title = card.querySelector('.video-title').textContent;
+            
+            // Remove from working if it was there
+            workingVideos = workingVideos.filter(v => v.id !== id);
+            
+            // Add to broken if not already there
+            if (!brokenVideos.find(v => v.id === id)) {
+                brokenVideos.push({ section, id, title });
+            }
+            
+            // Update status
+            const status = card.querySelector('.status');
+            status.className = 'status broken';
+            status.textContent = '❌ Broken - Does not play';
+            
+            updateSummary();
+        }
+        
+        function updateSummary() {
+            document.getElementById('workingCount').textContent = workingVideos.length;
+            document.getElementById('brokenCount').textContent = brokenVideos.length;
+            
+            const brokenList = document.getElementById('brokenList');
+            const brokenVideosUl = document.getElementById('brokenVideos');
+            
+            if (brokenVideos.length > 0) {
+                brokenList.style.display = 'block';
+                brokenVideosUl.innerHTML = brokenVideos.map(v => 
+                    `<li><strong>${v.section}</strong>: ${v.title} (ID: ${v.id})</li>`
+                ).join('');
+            } else {
+                brokenList.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
